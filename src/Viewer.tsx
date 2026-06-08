@@ -13,7 +13,7 @@ export const Viewer = () => {
 				activeId={activeTab}
 				onSelect={setActiveTab}
 			/>
-			<button className='absolute right-0'>Reset</button>
+			<button className='absolute right-0 btn btn-primary my-8 mr-10'>Reset</button>
 			<main className="flex-1 pb-[30px] relative">
 				{AMBIENTES.map(a => (
 					<div

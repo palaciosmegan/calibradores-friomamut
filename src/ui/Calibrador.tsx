@@ -46,7 +46,7 @@ interface SensorRowProps {
 
 const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange, onEnabledChange, unidad }: SensorRowProps) => (
 	<tr className="border-b border-[var(--color-border-subtle)] transition-colors hover:bg-[rgba(33,150,243,0.04)]">
-		<td className="py-2 px-3 text-sm text-[var(--color-text-secondary)]">
+		<td className="py-2 px-3 text-sm tracking-wider text-[var(--color-text-secondary)]">
 			{getDisplayName(sensor)}
 		</td>
 		<td className="py-2 px-3">
@@ -171,8 +171,10 @@ export const Calibrador = memo(({ ambienteId }: CalibradorProps) => {
 					/>
 				</div>
 			)}
-			<button>Guardar registro</button>
-			<button>No calibrado</button>
+			<div className="flex gap-3 justify-end">
+				<button className="btn btn-primary">Guardar registro</button>
+				<button className="btn btn-primary">No calibrado</button>
+			</div>
 		</div>
 	)
 })

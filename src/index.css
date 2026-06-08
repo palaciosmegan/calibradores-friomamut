@@ -507,7 +507,7 @@
     box-shadow:
       0 6px 30px rgba(33, 150, 243, 0.5),
       var(--glow-blue);
-    transform: translateY(-1px);
+    transform: translateY(-0.5px);
   }
   .btn-secondary {
     background: transparent;
@@ -518,15 +518,6 @@
     background: rgba(33, 150, 243, 0.08);
     border-color: var(--color-blue-bright);
     box-shadow: var(--glow-blue);
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--color-text-secondary);
-    border: none;
-  }
-  .btn-ghost:hover {
-    color: var(--color-text-primary);
-    background: rgba(255, 255, 255, 0.04);
   }
   .btn-teal {
     background: linear-gradient(
