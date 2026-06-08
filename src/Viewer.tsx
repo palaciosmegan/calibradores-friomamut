@@ -18,7 +18,7 @@ export const Viewer = () => {
 				{AMBIENTES.map(a => (
 					<div
 						key={a.id}
-						className={` ${a.id !== activeTab ? ' invisible' : ''}`}
+						className={` ${a.id !== activeTab ? 'hidden' : ''}`}
 					>
 						<Calibrador
 							ambienteId={a.id}

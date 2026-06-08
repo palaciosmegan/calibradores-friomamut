@@ -151,7 +151,7 @@ export const Calibrador = memo(({ ambienteId }: CalibradorProps) => {
 			{loaded && sensores.length === 0 ? (
 				<Message />
 			) : (
-				<div className="flex gap-6">
+				<div className="flex flex-col lg:flex-row gap-6">
 					<SensorTable
 						sensores={left}
 						corrections={corrections}
