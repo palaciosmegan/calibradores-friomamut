@@ -133,7 +133,7 @@ export const Calibrador = memo(forwardRef<CalibradorHandle, CalibradorProps>(({ 
 				>
 					Guardar registro
 				</button>
-				<button type="button" className="btn btn-danger">
+				<button type="button" className="btn btn-secondary">
 					No calibrado
 				</button>
 			</div>

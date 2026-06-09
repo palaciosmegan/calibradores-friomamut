@@ -1,8 +1,19 @@
 import { useState, useRef } from 'react'
 import clsx from 'clsx'
 import { Nav } from './ui/Nav'
-import { AMBIENTES } from './config/ambientes.config'
 import { Calibrador, type CalibradorHandle } from './ui/Calibrador'
+
+type Ambiente = {
+  id: number
+  label: string
+}
+
+const AMBIENTES: Ambiente[] = [
+  { id: 1, label: 'Túnel 1' },
+  { id: 2, label: 'Túnel 2' },
+  { id: 3, label: 'Túnel 3' },
+  { id: 4, label: 'Túnel 4' },
+]
 
 export const Viewer = () => {
 	const [activeTab, setActiveTab] = useState(AMBIENTES[0].id)
@@ -16,7 +27,7 @@ export const Viewer = () => {
 				onSelect={setActiveTab}
 			/>
 			<button
-				className='absolute right-0 btn btn-ghost my-8 mr-10'
+				className='absolute right-0 btn btn-secondary my-8 mr-10'
 				onClick={() => refs.current[activeTab]?.reset()}
 			>
 				Reset
