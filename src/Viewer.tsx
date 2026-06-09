@@ -2,22 +2,41 @@ import { useState, useRef } from 'react'
 import clsx from 'clsx'
 import { Nav } from './ui/Nav'
 import { Calibrador, type CalibradorHandle } from './ui/Calibrador'
+// import type { SensorMock, MOCK_SENSORES } from './mock-data/sensores.mock'
 
-type Ambiente = {
-  id: number
-  label: string
+export type Ambiente = {
+	id: number
+	label: string
 }
 
 const AMBIENTES: Ambiente[] = [
-  { id: 1, label: 'Túnel 1' },
-  { id: 2, label: 'Túnel 2' },
-  { id: 3, label: 'Túnel 3' },
-  { id: 4, label: 'Túnel 4' },
+	{ id: 1, label: 'Túnel 1' },
+	{ id: 2, label: 'Túnel 2' },
+	{ id: 3, label: 'Túnel 3' },
+	{ id: 4, label: 'Túnel 4' },
 ]
 
 export const Viewer = () => {
 	const [activeTab, setActiveTab] = useState(AMBIENTES[0].id)
 	const refs = useRef<Record<number, CalibradorHandle | null>>({})
+
+	/* useEffect(() => {
+		const fetchSensores = async () => {
+			let data: SensorMock[] = []
+			try {
+				const r = await fetch(`/lectura/estructura/${ambienteId}`)
+				const json: SensorMock[] = await r.json()
+				data = json?.length ? json : (MOCK_SENSORES[ambienteId] ?? [])
+			} catch {
+				data = MOCK_SENSORES[ambienteId] ?? []
+			} finally {
+				setSensores(data)
+				setEnabled(Object.fromEntries(data.map(s => [s.id, s.habilitado])))
+				setLoaded(true)
+			}
+		}
+		fetchSensores()
+	}, [ambienteId]) */
 
 	return (
 		<div className="flex flex-col">

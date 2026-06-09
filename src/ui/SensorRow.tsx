@@ -14,7 +14,8 @@ const orientationParsed = { INT: 'Interior', EXT: 'Exterior' }
 
 const getDisplayName = (sensor: SensorMock) => {
   const sensorName = sensor.id
-  if (sensorName.substring(0, 1) === 'S') {
+  console.log(sensor.id)
+  if (sensorName.substring(0, 1) === 'T') {
     return 'S' + sensorName.split('S')[1].replace(/^0+(?!$)/, '') + ' - ' + orientationParsed[sensor.orientation]
   }
   return 'Sensor Ambiente'

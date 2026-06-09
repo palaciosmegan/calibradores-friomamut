@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { clsx } from "clsx";
-import type { Ambiente } from "../config/ambientes.config";
+import type { Ambiente } from "../Viewer";
 
 interface NavProps {
 	TABS: Ambiente[];
