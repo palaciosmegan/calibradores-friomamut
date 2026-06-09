@@ -1,78 +1,16 @@
-import { useState, useEffect, memo, useCallback } from 'react'
+import { useState, useEffect, memo, useCallback, useImperativeHandle, forwardRef } from 'react'
 import { MOCK_SENSORES, type SensorMock } from '../mock-data/sensores.mock'
 import { Message } from './Message'
+import { SensorRow } from './SensorRow'
+
+export interface CalibradorHandle {
+	reset: () => void
+}
 
 interface CalibradorProps {
 	ambienteId: number
 	isActive: boolean
 }
-
-const orientationParsed = { INT: 'Interior', EXT: 'Exterior' }
-
-const getDisplayName = (sensor: SensorMock) => {
-	const sensorName = sensor.id.substring(0, 1) === 'T' ? sensor.id.split(' ')[1] : sensor.id
-	if (sensorName.substring(0, 1) === 'S') {
-		return 'S' + sensorName.split('S')[1].replace(/^0+(?!$)/, '') + ' - ' + orientationParsed[sensor.orientation]
-	}
-	return 'Sensor Ambiente'
-}
-
-const Toggle = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
-	<button
-		type="button"
-		role="switch"
-		aria-checked={checked}
-		onClick={onChange}
-		className={`relative w-10 h-[22px] rounded-full outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-[var(--color-teal-glow)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-abyss)] ${
-			checked
-				? 'bg-[var(--color-teal-mid)] shadow-[0_0_10px_rgba(0,131,143,0.6)]'
-				: 'bg-[var(--color-raised)]'
-		}`}
-	>
-		<span className={`absolute top-[3px] left-[3px] w-4 h-4 rounded-full shadow-md transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-			checked ? 'translate-x-[18px] bg-white' : 'translate-x-0 bg-[var(--color-text-muted)]'
-		}`} />
-	</button>
-)
-
-interface SensorRowProps {
-	sensor: SensorMock
-	correction: string
-	enabled: boolean
-	onCorrectionChange: (id: string, value: string) => void
-	onEnabledChange: (id: string) => void
-	unidad: string
-}
-
-const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange, onEnabledChange, unidad }: SensorRowProps) => (
-	<tr className="border-b border-[var(--color-border-subtle)] transition-colors hover:bg-[rgba(33,150,243,0.04)]">
-		<td className="py-2 px-3 text-sm tracking-wider text-[var(--color-text-secondary)]">
-			{getDisplayName(sensor)}
-		</td>
-		<td className="py-2 px-3">
-			<div className="inline-flex items-center gap-1 bg-[#0d3a6e] border border-[var(--color-blue-bright)] rounded-[var(--radius-md)] px-2 py-1 transition-all focus-within:shadow-[0_0_0_3px_rgba(33,150,243,0.25),var(--glow-blue)]">
-				<input
-					type="number"
-					step="0.1"
-					placeholder="0.0"
-					value={correction}
-					onChange={e => onCorrectionChange(sensor.id, e.target.value)}
-					className="w-14 bg-transparent outline-none text-sm font-mono text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)]"
-				/>
-				<span className="text-sm font-mono text-[var(--color-text-primary)] select-none">{unidad}</span>
-			</div>
-		</td>
-		<td className="py-2 px-3 text-sm font-mono text-[var(--color-text-primary)] tabular-nums">
-			{sensor.valor.toFixed(1)} {unidad}
-		</td>
-		<td className="py-2 px-3">
-			{!(sensor.posicion === 101) && (
-			<Toggle checked={enabled} onChange={() => onEnabledChange(sensor.id)} />
-			)}
-		</td>
-	</tr>
-))
-SensorRow.displayName = 'SensorRow'
 
 const SensorTable = ({ sensores, corrections, enabled, onCorrectionChange, onEnabledChange, unidad }: {
 	sensores: SensorMock[]
@@ -110,7 +48,7 @@ const SensorTable = ({ sensores, corrections, enabled, onCorrectionChange, onEna
 	</div>
 )
 
-export const Calibrador = memo(({ ambienteId }: CalibradorProps) => {
+export const Calibrador = memo(forwardRef<CalibradorHandle, CalibradorProps>(({ ambienteId }, ref) => {
 	const [sensores, setSensores] = useState<SensorMock[]>([])
 	const [loaded, setLoaded] = useState(false)
 	const [corrections, setCorrections] = useState<Record<string, string>>({})
@@ -142,9 +80,24 @@ export const Calibrador = memo(({ ambienteId }: CalibradorProps) => {
 		setEnabled(prev => ({ ...prev, [id]: !prev[id] }))
 	}, [])
 
-	// odd posicion + posicion 101 (ambiente) | even posicion only
+	const handleGuardar = useCallback(() => {
+		setSensores(prev => prev.map(s => {
+			const corr = parseFloat(corrections[s.id] ?? '0') || 0
+			return corr !== 0 ? { ...s, valor: +(s.valor - corr).toFixed(1) } : s
+		}))
+		setCorrections({})
+	}, [corrections])
+
+	const handleReset = useCallback(() => {
+		setCorrections({})
+	}, [])
+
+	useImperativeHandle(ref, () => ({ reset: handleReset }), [handleReset])
+
 	const left = sensores.filter(s => s.posicion % 2 !== 0 && s.posicion < 102)
 	const right = sensores.filter(s => s.posicion % 2 === 0 && s.posicion < 101)
+
+	const hasCorrections = Object.values(corrections).some(v => v !== '')
 
 	return (
 		<div className="p-4">
@@ -171,12 +124,21 @@ export const Calibrador = memo(({ ambienteId }: CalibradorProps) => {
 					/>
 				</div>
 			)}
-			<div className="flex gap-3 justify-end">
-				<button className="btn btn-primary">Guardar registro</button>
-				<button className="btn btn-primary">No calibrado</button>
+			<div className="flex gap-3 justify-end mt-6 mr-6">
+				<button
+					type="button"
+					onClick={handleGuardar}
+					disabled={!hasCorrections}
+					className="btn btn-primary"
+				>
+					Guardar registro
+				</button>
+				<button type="button" className="btn btn-danger">
+					No calibrado
+				</button>
 			</div>
 		</div>
 	)
-})
+}))
 
 Calibrador.displayName = 'Calibrador'

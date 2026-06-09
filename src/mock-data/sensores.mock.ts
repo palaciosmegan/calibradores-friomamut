@@ -31,11 +31,11 @@ export const MOCK_SENSORES: Record<number, SensorMock[]> = {
     { posicion: 22, orientation: 'EXT', id: 'T01 S14', valor: -20.4, habilitado: true },
     { posicion: 23, orientation: 'INT', id: 'T01 S15', valor: -19.2, habilitado: true },
     { posicion: 32, orientation: 'EXT', id: 'T01 S16', valor: 31.5, habilitado: true },
-    { posicion: 101, orientation: 'EXT', id: 'A01', valor: 100, habilitado: true }, //ambiente
-    { posicion: 102, orientation: 'EXT', id: 'A02', valor: 103, habilitado: true }, //retorno
-    { posicion: 103, orientation: 'EXT', id: 'A03', valor: -800, habilitado: true }, //presión de palet
-    { posicion: 104, orientation: 'EXT', id: 'A04', valor: -298, habilitado: true }, //presión de ventilador
-    { posicion: 105, orientation: 'EXT', id: 'A05', valor: 201, habilitado: true }, //caudal
+    { posicion: 101, orientation: 'EXT', id: 'A01', valor: 100, habilitado: true }, // ambiente
+    { posicion: 102, orientation: 'EXT', id: 'A02', valor: 103, habilitado: true }, // retorno
+    { posicion: 103, orientation: 'EXT', id: 'A03', valor: -800, habilitado: true }, // presión de palet
+    { posicion: 104, orientation: 'EXT', id: 'A04', valor: -298, habilitado: true }, // presión de ventilador
+    { posicion: 105, orientation: 'EXT', id: 'A05', valor: 201, habilitado: true }, // caudal
   ],
   2: [
     { posicion: 1, orientation: 'INT', id: 'T02 S01', valor: -22.1, habilitado: true },
