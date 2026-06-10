@@ -22,12 +22,11 @@ const getDisplayName = (sensor: SensorMock) => {
 }
 
 export const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange, onEnabledChange, unidad }: SensorRowProps) => {
-  const handleDecrement = () => {
-    console.log('uwu')
-  }
-  const handleIncrement = () => {
-    console.log('owo')
-  }
+  const handleDecrement = () =>
+    onCorrectionChange(sensor.id, ((parseFloat(correction) || 0) - 0.1).toFixed(1))
+
+  const handleIncrement = () =>
+    onCorrectionChange(sensor.id, ((parseFloat(correction) || 0) + 0.1).toFixed(1))
   return (
     <tr className="border-b border-[var(--color-border-subtle)] transition-colors hover:bg-[rgba(33,150,243,0.04)]">
       <td className="px-3">
@@ -52,7 +51,7 @@ export const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange
             placeholder="0.0"
             value={correction}
             onChange={e => onCorrectionChange(sensor.id, e.target.value)}
-            className="w-8 bg-transparent outline-none text-sm font-mono text-[var(--color-text-primary)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-[var(--color-text-secondary)]"
+            className="w-11 text-center bg-transparent outline-none text-sm font-mono text-[var(--color-text-primary)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-[var(--color-text-secondary)]"
           />
           <span className="text-sm font-mono text-[var(--color-text-primary)] select-none">{unidad}</span>
         </div>
@@ -64,7 +63,7 @@ export const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange
         </button>
       </td>
       <td className="py-2 px-3 text-sm font-mono text-[var(--color-text-primary)] tabular-nums">
-        {sensor.valor.toFixed(1)} {unidad}
+        {(sensor.valor - (parseFloat(correction) || 0)).toFixed(1)} {unidad}
       </td>
       <td className=" "><button className="btn btn-primary scale-75 tracking-wide uppercase">auto calibrar</button></td>
     </tr>
