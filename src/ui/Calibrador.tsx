@@ -24,7 +24,7 @@ const SensorTable = ({ sensores, corrections, enabled, onCorrectionChange, onEna
 		<table className="w-full border-collapse">
 			<thead>
 				<tr className="border-b border-[var(--color-border-default)]">
-					{['Descripción', 'Corrección', 'Temperatura', 'Habilitado'].map(col => (
+					{['', 'Descripción', 'Corrección', 'Temperatura', 'Auto'].map(col => (
 						<th key={col} className="py-2 px-3 text-left text-xs font-medium tracking-wider uppercase text-[var(--color-blue-soft)]">
 							{col}
 						</th>
@@ -104,7 +104,7 @@ export const Calibrador = memo(forwardRef<CalibradorHandle, CalibradorProps>(({ 
 			{loaded && sensores.length === 0 ? (
 				<Message />
 			) : (
-				<div className="flex flex-col lg:flex-row gap-6">
+				<div className="flex flex-col xl:flex-row gap-6">
 					<SensorTable
 						sensores={left}
 						corrections={corrections}

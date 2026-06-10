@@ -1,15 +1,14 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import clsx from 'clsx'
 import { Nav } from './ui/Nav'
 import { Calibrador, type CalibradorHandle } from './ui/Calibrador'
-// import type { SensorMock, MOCK_SENSORES } from './mock-data/sensores.mock'
 
 export type Ambiente = {
 	id: number
 	label: string
 }
 
-const AMBIENTES: Ambiente[] = [
+const AMBIENTESHARDCODED: Ambiente[] = [
 	{ id: 1, label: 'Túnel 1' },
 	{ id: 2, label: 'Túnel 2' },
 	{ id: 3, label: 'Túnel 3' },
@@ -17,31 +16,40 @@ const AMBIENTES: Ambiente[] = [
 ]
 
 export const Viewer = () => {
-	const [activeTab, setActiveTab] = useState(AMBIENTES[0].id)
+	const [ambientes, setAmbientes] = useState<Ambiente[]>([])
+	const [activeTab, setActiveTab] = useState<number | null>(null)
 	const refs = useRef<Record<number, CalibradorHandle | null>>({})
 
-	/* useEffect(() => {
-		const fetchSensores = async () => {
-			let data: SensorMock[] = []
+	useEffect(() => {
+		const discover = async () => {
+			let ambientesDisponibles: Ambiente[] = []
 			try {
-				const r = await fetch(`/lectura/estructura/${ambienteId}`)
-				const json: SensorMock[] = await r.json()
-				data = json?.length ? json : (MOCK_SENSORES[ambienteId] ?? [])
+				const res = await fetch('/lectura/estructura/0')
+				const data = await res.json()
+				if (data.disponibles) {
+					ambientesDisponibles = (data.disponibles.map((tunel: string) => ({
+						id: parseInt(tunel),
+						label: 'Túnel ' + tunel,
+					})))
+				}
 			} catch {
-				data = MOCK_SENSORES[ambienteId] ?? []
-			} finally {
-				setSensores(data)
-				setEnabled(Object.fromEntries(data.map(s => [s.id, s.habilitado])))
-				setLoaded(true)
+				// si no se encontraron, usar el fallback
+				ambientesDisponibles = AMBIENTESHARDCODED
 			}
+
+			setAmbientes(ambientesDisponibles)
+			setActiveTab(ambientesDisponibles[0].id)
 		}
-		fetchSensores()
-	}, [ambienteId]) */
+
+		discover()
+	}, [])
+
+	if (activeTab === null) return null
 
 	return (
 		<div className="flex flex-col">
 			<Nav
-				TABS={AMBIENTES}
+				TABS={ambientes}
 				activeId={activeTab}
 				onSelect={setActiveTab}
 			/>
@@ -52,7 +60,7 @@ export const Viewer = () => {
 				Reset
 			</button>
 			<main className="flex-1 pb-[30px] relative">
-				{AMBIENTES.map(a => (
+				{ambientes.map(a => (
 					<div
 						key={a.id}
 						className={clsx(a.id !== activeTab && 'hidden')}
