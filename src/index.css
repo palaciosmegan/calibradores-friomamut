@@ -327,6 +327,10 @@
     color: var(--color-text-secondary);
   }
 
+  table {
+    margin: auto;
+  }
+
   /* Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;

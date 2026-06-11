@@ -12,20 +12,21 @@ interface CalibradorProps {
 	isActive: boolean
 }
 
-const SensorTable = ({ sensores, corrections, enabled, onCorrectionChange, onEnabledChange, unidad }: {
+const SensorTable = ({ sensores, corrections, savedCorrections, enabled, onCorrectionChange, onEnabledChange, unidad }: {
 	sensores: SensorMock[]
 	corrections: Record<string, string>
+	savedCorrections: Record<string, string>
 	enabled: Record<string, boolean>
 	onCorrectionChange: (id: string, value: string) => void
 	onEnabledChange: (id: string) => void
 	unidad: string
 }) => (
 	<div className="flex-1 min-w-0">
-		<table className="w-full border-collapse">
+		<table className="border-collapse">
 			<thead>
 				<tr className="border-b border-[var(--color-border-default)]">
 					{['', 'Descripción', 'Corrección', 'Temperatura', 'Auto'].map(col => (
-						<th key={col} className="py-2 px-3 text-left text-xs font-medium tracking-wider uppercase text-[var(--color-blue-soft)]">
+						<th key={col} className="py-2 px-3 text-center text-xs font-medium tracking-wider uppercase text-[var(--color-blue-soft)]">
 							{col}
 						</th>
 					))}
@@ -37,6 +38,7 @@ const SensorTable = ({ sensores, corrections, enabled, onCorrectionChange, onEna
 						key={s.id}
 						sensor={s}
 						correction={corrections[s.id] ?? ''}
+						savedCorrection={savedCorrections[s.id] ?? ''}
 						enabled={enabled[s.id] ?? true}
 						onCorrectionChange={onCorrectionChange}
 						onEnabledChange={onEnabledChange}
@@ -52,16 +54,24 @@ export const Calibrador = memo(forwardRef<CalibradorHandle, CalibradorProps>(({ 
 	const [sensores, setSensores] = useState<SensorMock[]>([])
 	const [loaded, setLoaded] = useState(false)
 	const [corrections, setCorrections] = useState<Record<string, string>>({})
+	const [savedCorrections, setSavedCorrections] = useState<Record<string, string>>({})
 	const [enabled, setEnabled] = useState<Record<string, boolean>>({})
 
+
 	useEffect(() => {
+		const controller = new AbortController()
+		const timeout = setTimeout(() => controller.abort(), 3000)
+
 		const fetchSensores = async () => {
 			let data: SensorMock[] = []
 			try {
-				const r = await fetch(`/lectura/estructura/${ambienteId}`)
+				const r = await fetch(`/lectura/estructura/${ambienteId}`, { signal: controller.signal })
+				clearTimeout(timeout)
+				if (!r.ok) throw new Error(`HTTP ${r.status}`)
 				const json: SensorMock[] = await r.json()
 				data = json?.length ? json : (MOCK_SENSORES[ambienteId] ?? [])
 			} catch {
+				clearTimeout(timeout)
 				data = MOCK_SENSORES[ambienteId] ?? []
 			} finally {
 				setSensores(data)
@@ -84,6 +94,10 @@ export const Calibrador = memo(forwardRef<CalibradorHandle, CalibradorProps>(({ 
 		setSensores(prev => prev.map(s => {
 			const corr = parseFloat(corrections[s.id] ?? '0') || 0
 			return corr !== 0 ? { ...s, valor: +(s.valor - corr).toFixed(1) } : s
+		}))
+		setSavedCorrections(prev => ({
+			...prev,
+			...Object.fromEntries(Object.entries(corrections).filter(([, v]) => v !== ''))
 		}))
 		setCorrections({})
 	}, [corrections])
@@ -108,6 +122,7 @@ export const Calibrador = memo(forwardRef<CalibradorHandle, CalibradorProps>(({ 
 					<SensorTable
 						sensores={left}
 						corrections={corrections}
+						savedCorrections={savedCorrections}
 						enabled={enabled}
 						onCorrectionChange={handleCorrectionChange}
 						onEnabledChange={handleEnabledChange}
@@ -117,6 +132,7 @@ export const Calibrador = memo(forwardRef<CalibradorHandle, CalibradorProps>(({ 
 					<SensorTable
 						sensores={right}
 						corrections={corrections}
+						savedCorrections={savedCorrections}
 						enabled={enabled}
 						onCorrectionChange={handleCorrectionChange}
 						onEnabledChange={handleEnabledChange}

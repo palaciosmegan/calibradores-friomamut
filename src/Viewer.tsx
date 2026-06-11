@@ -20,11 +20,17 @@ export const Viewer = () => {
 	const [activeTab, setActiveTab] = useState<number | null>(null)
 	const refs = useRef<Record<number, CalibradorHandle | null>>({})
 
+	
 	useEffect(() => {
+		const controller = new AbortController()
+		const timeout = setTimeout(() => controller.abort(), 1000)
+		
 		const discover = async () => {
 			let ambientesDisponibles: Ambiente[] = []
 			try {
-				const res = await fetch('/lectura/estructura/0')
+				const res = await fetch('/lectura/estructura/0', { signal: controller.signal })
+				clearTimeout(timeout)
+				if (!res.ok) throw new Error(`HTTP ${res.status}`)
 				const data = await res.json()
 				if (data.disponibles) {
 					ambientesDisponibles = (data.disponibles.map((tunel: string) => ({
@@ -34,6 +40,7 @@ export const Viewer = () => {
 				}
 			} catch {
 				// si no se encontraron, usar el fallback
+				clearTimeout(timeout)
 				ambientesDisponibles = AMBIENTESHARDCODED
 			}
 

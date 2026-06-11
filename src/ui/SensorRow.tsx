@@ -5,6 +5,7 @@ import { Toggle } from "./Toggle"
 interface SensorRowProps {
   sensor: SensorMock
   correction: string
+  savedCorrection: string
   enabled: boolean
   onCorrectionChange: (id: string, value: string) => void
   onEnabledChange: (id: string) => void
@@ -21,7 +22,9 @@ const getDisplayName = (sensor: SensorMock) => {
   return 'Sensor Ambiente'
 }
 
-export const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange, onEnabledChange, unidad }: SensorRowProps) => {
+export const SensorRow = memo(({ sensor, correction, savedCorrection, enabled, onCorrectionChange, onEnabledChange, unidad }: SensorRowProps) => {
+  // const isSaved = !correction && !!savedCorrection
+
   const handleDecrement = () =>
     onCorrectionChange(sensor.id, ((parseFloat(correction) || 0) - 0.1).toFixed(1))
 
@@ -48,12 +51,12 @@ export const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange
             id={correction}
             type="number"
             step="0.1"
-            placeholder="0.0"
+            placeholder={savedCorrection || "0.0"}
             value={correction}
             onChange={e => onCorrectionChange(sensor.id, e.target.value)}
             className="w-11 text-center bg-transparent outline-none text-sm font-mono text-[var(--color-text-primary)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none placeholder:text-[var(--color-text-secondary)]"
           />
-          <span className="text-sm font-mono text-[var(--color-text-primary)] select-none">{unidad}</span>
+          <span className={`text-sm font-mono select-none text-[var(--color-text-secondary)]`}>{unidad}</span>
         </div>
         <button
           type="button"
@@ -63,9 +66,9 @@ export const SensorRow = memo(({ sensor, correction, enabled, onCorrectionChange
         </button>
       </td>
       <td className="py-2 px-3 text-sm font-mono text-[var(--color-text-primary)] tabular-nums">
-        {(sensor.valor - (parseFloat(correction) || 0)).toFixed(1)} {unidad}
+        {(sensor.valor + (parseFloat(correction) || 0)).toFixed(1)} {unidad}
       </td>
-      <td className=" "><button className="btn btn-primary scale-75 tracking-wide uppercase">auto calibrar</button></td>
+      <td><button className="btn btn-primary scale-75 tracking-wide uppercase">auto calibrar</button></td>
     </tr>
   )
 })
